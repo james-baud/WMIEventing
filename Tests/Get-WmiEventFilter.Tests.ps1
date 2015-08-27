@@ -96,6 +96,14 @@ Describe '__EventFilters' {
             Remove-WmiEventFilter
             Get-WmiEventFilter | Should Be $Null
         }
+
+        It 'Should not fail when there is nothing to Get' {
+            { Get-WmiEventFilter } | Should Not Throw
+        }
+
+        It 'Should not fail when there is nothing to Remove' {
+            { Remove-WmiEventFilter } | Should Not Throw
+        }
     }
 }
 
@@ -151,6 +159,13 @@ Describe '__EventConsumers' {
             Get-WmiEventConsumer | Should Be $Null
         }
 
+        It 'Should not fail when there is nothing to Get' {
+            { Get-WmiEventConsumer } | Should Not Throw
+        }
+
+        It 'Should not fail when there is nothing to Remove' {
+            { Remove-WmiEventConsumer } | Should Not Throw
+        }
     }
 }
 
@@ -196,6 +211,13 @@ Describe '__FilterToConsumerBinding' {
         It 'Should remove all local __FilterToConsumerBindings' {
             Remove-WmiEventSubscription
             Get-WmiEventSubscription | Should Be $Null
+        }
+        It 'Should not fail when there is nothing to Get' {
+            { Get-WmiEventSubscription } | Should Not Throw
+        }
+
+        It 'Should not fail when there is nothing to Remove' {
+            { Remove-WmiEventSubscription } | Should Not Throw
         }
     }
 }
