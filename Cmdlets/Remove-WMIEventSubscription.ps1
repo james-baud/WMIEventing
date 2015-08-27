@@ -5,6 +5,9 @@
         [Parameter()]
             [string[]]$ComputerName = 'localhost',
 
+        [Parameter()]
+            [Int32]$ThrottleLimit = 32,
+
         #[Parameter()]
         #    [switch]$Force,
         
@@ -26,7 +29,7 @@
         }
         else
         {
-            $jobs = Get-WmiObject -ComputerName $ComputerName -Namespace root\subscription -Class __FilterToConsumerBinding -AsJob
+            $jobs = Get-WmiObject -ComputerName $ComputerName -Namespace root\subscription -Class __FilterToConsumerBinding -AsJob -ThrottleLimit $ThrottleLimit
             
             $objects = Receive-Job -Job $jobs -Wait -AutoRemoveJob
 

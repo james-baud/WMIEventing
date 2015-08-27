@@ -4,6 +4,9 @@
     Param(
         [Parameter()]
             [string[]]$ComputerName = 'localhost',
+
+        [Parameter()]
+            [Int32]$ThrottleLimit = 32,
         
         [Parameter(Mandatory = $True, ParameterSetName = 'Name', Position = 0)]
             [string]$Name,
@@ -20,7 +23,7 @@
         }
         else
         {
-            $jobs = Get-WmiObject -ComputerName $ComputerName -Namespace 'root\subscription' -Class __EventConsumer -AsJob
+            $jobs = Get-WmiObject -ComputerName $ComputerName -Namespace 'root\subscription' -Class __EventConsumer -AsJob -ThrottleLimit $ThrottleLimit
             
             $objects = Receive-Job -Job $jobs -Wait -AutoRemoveJob
 

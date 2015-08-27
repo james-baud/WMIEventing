@@ -1,11 +1,16 @@
 ﻿function Add-WmiEventSubscription
 {
-        [CmdletBinding()]
+    [CmdletBinding()]
     Param(
         [Parameter(ValueFromPipeline = $True)]
             [string[]]$ComputerName = 'localhost',
+
+        [Parameter()]
+            [Int32]$ThrottleLimit = 32,
+
         [Parameter(Mandatory = $True)]
             [string]$FilterName,
+        
         [Parameter(Mandatory = $True)]
             [string]$ConsumerName
     )
@@ -20,7 +25,7 @@
 
     PROCESS
     {
-        $jobs = Set-WmiInstance -ComputerName $ComputerName -Namespace root\subscription -Class __FilterToConsumerBinding -Arguments $props -AsJob
+        $jobs = Set-WmiInstance -ComputerName $ComputerName -Namespace root\subscription -Class __FilterToConsumerBinding -Arguments $props -AsJob -ThrottleLimit $ThrottleLimit 
     }
 
     END

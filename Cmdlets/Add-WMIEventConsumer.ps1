@@ -4,20 +4,13 @@
     Param(
         #region CommonParameters
         
-        [Parameter(ParameterSetName = 'ActiveScriptFileComputerSet')] 
-        [Parameter(ParameterSetName = 'ActiveScriptTextComputerSet')] 
-        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
-        [Parameter(ParameterSetName = "LogFileComputerSet")]
-        [Parameter(ParameterSetName = "NtEventLogComputerSet")]
-        [Parameter(ParameterSetName = "SMTPComputerSet")]
+        [Parameter()] 
             [string[]]$ComputerName = 'localhost',
+
+        [Parameter()]
+            [Int32]$ThrottleLimit = 32,
         
-        [Parameter(Mandatory = $True, ParameterSetName = 'ActiveScriptFileComputerSet')] 
-        [Parameter(Mandatory = $True, ParameterSetName = 'ActiveScriptTextComputerSet')] 
-        [Parameter(Mandatory = $True, ParameterSetName = 'CommandLineComputerSet')]
-        [Parameter(Mandatory = $True, ParameterSetName = "LogFileComputerSet")]
-        [Parameter(Mandatory = $True, ParameterSetName = "NtEventLogComputerSet")]
-        [Parameter(Mandatory = $True, ParameterSetName = "SMTPComputerSet")]
+        [Parameter(Mandatory = $True)] 
             [string]$Name,
 
         [Parameter(ParameterSetName = 'ActiveScriptFileComputerSet')]
@@ -347,7 +340,7 @@
 
     PROCESS
     {
-        $jobs = Set-WmiInstance -ComputerName $ComputerName -Namespace root\subscription -Class $class -Arguments $props -AsJob
+        $jobs = Set-WmiInstance -ComputerName $ComputerName -Namespace root\subscription -Class $class -Arguments $props -AsJob -ThrottleLimit $ThrottleLimit 
     }
     
     END
