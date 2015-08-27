@@ -3,7 +3,7 @@
 Developed by [@jaredcatkinson](https://twitter.com/jaredcatkinson), [@harmj0y](https://twitter.com/harmj0y), [@sixdub](https://twitter.com/sixdub)
 
 ## Overview
-An Event Filter is a WMI Query Language (WQL) query that specifies the type of object to look for (for more details on WQL please check out Ravikanth Chaganti's free ebook at http://www.ravichaganti.com/blog/ebook-wmi-query-language-via-powershell/). Event Consumers are the action component of the Event Subscription. Event Consumers tell the subscription what to do with an object that makes it past the filter. There are five default event consumers in Windows: ActionScriptEventConsumer (runs arbitrary vbscript or jscript code), CommandLineEventConsumer (executes an arbitrary command), LogFileEventConsumer (writes to a specified flat log file), NtEventLogEventConsumer (creates a new event log), and SMTPEventConsumer (sends an email). Lastly, the Filter to Consumer Binding pairs a Filter with a Consumer.
+An Event Filter ([__EventFilter](https://msdn.microsoft.com/en-us/library/aa394639(v=vs.85).aspx)) is a WMI Query Language (WQL) query that specifies the type of object to look for (for more details on WQL please check out Ravikanth Chaganti's free ebook at http://www.ravichaganti.com/blog/ebook-wmi-query-language-via-powershell/). Event Consumers ([__EventConsumer](https://msdn.microsoft.com/en-us/library/aa394635(v=vs.85).aspx)) are the action component of the Event Subscription. Event Consumers tell the subscription what to do with an object that makes it past the filter. There are five default event consumers in Windows: [ActionScriptEventConsumer](https://msdn.microsoft.com/en-us/library/aa384749(v=vs.85).aspx) (runs arbitrary vbscript or jscript code), [CommandLineEventConsumer](https://msdn.microsoft.com/en-us/library/aa389231(v=vs.85).aspx) (executes an arbitrary command), [LogFileEventConsumer](https://msdn.microsoft.com/en-us/library/aa392277(v=vs.85).aspx) (writes to a specified flat log file), [NtEventLogEventConsumer](https://msdn.microsoft.com/en-us/library/aa392715(v=vs.85).aspx) (creates a new event log), and [SMTPEventConsumer](https://msdn.microsoft.com/en-us/library/aa393629(v=vs.85).aspx) (sends an email). Lastly, the Binding ([__FilterToConsumerBinding](https://msdn.microsoft.com/en-us/library/aa394647(v=vs.85).aspx)) pairs a Filter with a Consumer.
 
 ## Cmdlets
 ### Event Filter (__EventFilter):
@@ -27,7 +27,7 @@ Get-WmiEventSubscription - Gets the WMI Event Subscriptions that are "installed"
 Remove-WmiEventSubscription - Removes a WMI Event Subscriptions to a local or remote computer.
 ```
 
-## Module Installation
+## [Module Installation](https://msdn.microsoft.com/en-us/library/dd878350(v=vs.85).aspx)
 ```powershell
 function Get-UserModulePath {
  
