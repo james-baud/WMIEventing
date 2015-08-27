@@ -1,31 +1,36 @@
 ﻿function Add-WmiEventFilter
 {
-    [CmdletBinding(DefaultParameterSetName = "FilterFile")]
+    [CmdletBinding()]
     Param(
-        [Parameter(Mandatory = $False, ValueFromPipeline = $True)]
+        [Parameter(ValueFromPipeline = $True)]
             [string[]]$ComputerName = 'localhost',
-        [Parameter(Mandatory = $True, ParameterSetName = "Name")]
+        [Parameter(Mandatory = $True)]
             [string]$Name,
-        [Parameter(Mandatory = $False, ParameterSetName = "Name")]
+        [Parameter()]
             [string]$EventNamespace = 'root\cimv2',
-        [Parameter(Mandatory = $True, ParameterSetName = "Name")]
+        [Parameter(Mandatory = $True)]
             [string]$Query,
-        [Parameter(Mandatory = $False, ParameterSetName = "Name")]
-            [string]$QueryLanguage = 'WQL'
+        [Parameter()]
+            [string]$QueryLanguage = 'WQL' 
     )
+
+    BEGIN
+    {
+        $props = @{
+            'Name' = $Name;
+            'EventNamespace' = $EventNamespace;
+            'Query' = $Query;
+            'QueryLanguage' = $QueryLanguage
+        }
+    }
 
     PROCESS
     {
-        foreach($computer in $ComputerName)
-        {
-            $class = [WMICLASS]"\\$computer\root\subscription:__EventFilter"
+       $jobs = Set-WmiInstance -ComputerName $ComputerName -Namespace root\subscription -Class __EventFilter -Arguments $props -AsJob
+    }
 
-            $instance = $class.CreateInstance()
-            $instance.Name = $Name
-            $instance.EventNamespace = $EventNamespace
-            $instance.Query = $Query
-            $instance.QueryLanguage = $QueryLanguage
-            $instance.Put()
-        }
+    END
+    {
+        Receive-Job -Job $jobs -Wait -AutoRemoveJob
     }
 }

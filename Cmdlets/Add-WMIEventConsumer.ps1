@@ -1,261 +1,357 @@
 ﻿function Add-WmiEventConsumer
 {
-    [CmdletBinding(DefaultParameterSetName = 'ConsumerFile')]
+    [CmdletBinding()]
     Param(
-        [Parameter(Mandatory = $False, ValueFromPipeline = $True)]
-            [string[]]$ComputerName = 'localhost',
-        [Parameter(Mandatory = $True, ParameterSetName = 'ActiveScriptFile')] 
-        [Parameter(Mandatory = $True, ParameterSetName = 'ActiveScriptText')] 
-        [Parameter(Mandatory = $True, ParameterSetName = 'CommandLine')]
-        [Parameter(Mandatory = $True, ParameterSetName = "LogFile")]
-        [Parameter(Mandatory = $True, ParameterSetName = "NtEventLog")]
-        [Parameter(Mandatory = $True, ParameterSetName = "SMTP")]
-            [string]$Name,
+        #region CommonParameters
         
-        #Shared Parameters
-        [Parameter(Mandatory = $False, ParameterSetName = 'ActiveScriptFile')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'ActiveScriptText')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
+        [Parameter(ParameterSetName = 'ActiveScriptFileComputerSet')] 
+        [Parameter(ParameterSetName = 'ActiveScriptTextComputerSet')] 
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
+        [Parameter(ParameterSetName = "LogFileComputerSet")]
+        [Parameter(ParameterSetName = "NtEventLogComputerSet")]
+        [Parameter(ParameterSetName = "SMTPComputerSet")]
+            [string[]]$ComputerName = 'localhost',
+        
+        [Parameter(Mandatory = $True, ParameterSetName = 'ActiveScriptFileComputerSet')] 
+        [Parameter(Mandatory = $True, ParameterSetName = 'ActiveScriptTextComputerSet')] 
+        [Parameter(Mandatory = $True, ParameterSetName = 'CommandLineComputerSet')]
+        [Parameter(Mandatory = $True, ParameterSetName = "LogFileComputerSet")]
+        [Parameter(Mandatory = $True, ParameterSetName = "NtEventLogComputerSet")]
+        [Parameter(Mandatory = $True, ParameterSetName = "SMTPComputerSet")]
+            [string]$Name,
+
+        [Parameter(ParameterSetName = 'ActiveScriptFileComputerSet')]
+        [Parameter(ParameterSetName = 'ActiveScriptTextComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
             [UInt32]$KillTimeout = 0,
+        
+        #endregion CommonParameters
 
         #region ActiveScriptParameters
-        [Parameter(Mandatory = $False, ParameterSetName = 'ActiveScriptFile')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'ActiveScriptText')] 
+
+        [Parameter(ParameterSetName = 'ActiveScriptFileComputerSet')]
+        [Parameter(ParameterSetName = 'ActiveScriptTextComputerSet')] 
         [ValidateSet("VBScript", "jscript")]
             [string]$ScriptingEngine = "VBScript",
-        [Parameter(Mandatory = $True, ParameterSetName = 'ActiveScriptFile')] 
+
+        [Parameter(Mandatory = $True, ParameterSetName = 'ActiveScriptFileComputerSet')] 
         [ValidateNotNull()]
             [string]$ScriptFileName,
-        [Parameter(Mandatory = $True, ParameterSetName = 'ActiveScriptText')] 
+        
+        [Parameter(Mandatory = $True, ParameterSetName = 'ActiveScriptTextComputerSet')] 
         [ValidateNotNull()]
             [string]$ScriptText,
+        
         #endregion ActiveScriptParameters
         
         #region CommandLineParameters
-        [Parameter(Mandatory = $True, ParameterSetName = 'CommandLineTemplate')]
+        
+        [Parameter(Mandatory = $True, ParameterSetName = 'CommandLineTemplateComputerSet')]
         #Validate executable exists
             [string]$CommandLineTemplate,
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLineTemplate')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
-            [bool]$CreateNewProcessGroup = $True,
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLineTemplate')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
-            [bool]$CreateSeparateWowVdm = $False,
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLineTemplate')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
-            [bool]$CreateSharedWowVdm = $False,
-        [Parameter(Mandatory = $True, ParameterSetName = 'CommandLine')]
+        
+        [Parameter(Mandatory = $True, ParameterSetName = 'CommandLineComputerSet')]
             [string]$ExecutablePath,
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLineTemplate')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
+        
+        [Parameter(ParameterSetName = 'CommandLineTemplateComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
+            [bool]$CreateNewProcessGroup = $True,
+        
+        [Parameter(ParameterSetName = 'CommandLineTemplateComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
+            [bool]$CreateSeparateWowVdm = $False,
+        
+        [Parameter(ParameterSetName = 'CommandLineTemplateComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
+            [bool]$CreateSharedWowVdm = $False,
+        
+        [Parameter(ParameterSetName = 'CommandLineTemplateComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
             [bool]$ForceOffFeedback = $False,
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLineTemplate')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
+        
+        [Parameter(ParameterSetName = 'CommandLineTemplateComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
             [bool]$ForceOnFeedback = $False,
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLineTemplate')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
+        
+        [Parameter(ParameterSetName = 'CommandLineTemplateComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
         [ValidateSet(0x20, 0x40, 0x80, 0x100)]
             [Int32]$Priority = 0x20,
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLineTemplate')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
+        
+        [Parameter(ParameterSetName = 'CommandLineTemplateComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
             [bool]$RunInteractively = $False,
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLineTemplate')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
+        
+        [Parameter(ParameterSetName = 'CommandLineTemplateComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
         [ValidateRange(0x00,0x0A)]
             [UInt32]$ShowWindowCommand,
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLineTemplate')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
+        
+        [Parameter(ParameterSetName = 'CommandLineTemplateComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
             [bool]$UseDefaultErrorMode = $False,
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLineTemplate')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
+        
+        [Parameter(ParameterSetName = 'CommandLineTemplateComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
             [string]$WindowTitle,
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLineTemplate')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
+        
+        [Parameter(ParameterSetName = 'CommandLineTemplateComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
             [string]$WorkingDirectory,
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLineTemplate')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
+        
+        [Parameter(ParameterSetName = 'CommandLineTemplateComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
             [UInt32]$XCoordinate,
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLineTemplate')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
+        
+        [Parameter(ParameterSetName = 'CommandLineTemplateComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
             [UInt32]$XNumCharacters,
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLineTemplate')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
+        
+        [Parameter(ParameterSetName = 'CommandLineTemplateComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
             [UInt32]$XSize,
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLineTemplate')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
+        
+        [Parameter(ParameterSetName = 'CommandLineTemplateComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
             [UInt32]$YCoordinate,
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLineTemplate')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
+        
+        [Parameter(ParameterSetName = 'CommandLineTemplateComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
             [UInt32]$YNumCharacters,
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLineTemplate')]
-        [Parameter(Mandatory = $False, ParameterSetName = 'CommandLine')]
+        
+        [Parameter(ParameterSetName = 'CommandLineTemplateComputerSet')]
+        [Parameter(ParameterSetName = 'CommandLineComputerSet')]
             [UInt32]$YSize,
+        
         #endregion CommandLineParameters
 
         #region LogFileParameters
-        [Parameter(Mandatory = $True, ParameterSetName = "LogFile")]
+        
+        [Parameter(Mandatory = $True, ParameterSetName = "LogFileComputerSet")]
             [string]$Filename,
-        [Parameter(Mandatory = $False, ParameterSetName = "LogFile")]
+        
+        [Parameter(ParameterSetName = "LogFileComputerSet")]
             [bool]$IsUnicode = $True,
-        [Parameter(Mandatory = $False, ParameterSetName = "LogFile")]
+        
+        [Parameter(ParameterSetName = "LogFileComputerSet")]
             [UInt64]$MaximumFileSize = 0,
-        [Parameter(Mandatory = $True, ParameterSetName = "LogFile")]
+        
+        [Parameter(Mandatory = $True, ParameterSetName = "LogFileComputerSet")]
             [string]$Text,
+        
         #endregion LogFileParameters
 
         #region NtEventLogParameters
-        [Parameter(Mandatory = $False, ParameterSetName = "NtEventLog")]
+        
+        [Parameter(ParameterSetName = "NtEventLogComputerSet")]
         [ValidateNotNull()]
             [UInt16]$Category,
-        [Parameter(Mandatory = $True, ParameterSetName = "NtEventLog")]
+        
+        [Parameter(Mandatory = $True, ParameterSetName = "NtEventLogComputerSet")]
         [ValidateNotNull()]
             [UInt32]$EventID,
-        [Parameter(Mandatory = $False, ParameterSetName = "NtEventLog")]
+        
+        [Parameter(ParameterSetName = "NtEventLogComputerSet")]
         [ValidateSet(0, 1, 2, 4, 8, 16)]
         [ValidateNotNull()]
             [UInt32]$EventType = 1,
-        [Parameter(Mandatory = $False, ParameterSetName = "NtEventLog")]
+        
+        [Parameter(ParameterSetName = "NtEventLogComputerSet")]
             [string[]]$InsertionStringTemplates = @(),
-        [Parameter(Mandatory = $True, ParameterSetName = "NtEventLog")]
+        
+        [Parameter(Mandatory = $True, ParameterSetName = "NtEventLogComputerSet")]
             [string]$NameOfUserSidProperty,
-        [Parameter(Mandatory = $True, ParameterSetName = "NtEventLog")]
+        
+        [Parameter(Mandatory = $True, ParameterSetName = "NtEventLogComputerSet")]
             [string]$NameOfRawDataProperty,
-        [Parameter(Mandatory = $True, ParameterSetName = "NtEventLog")]
+        
+        [Parameter(Mandatory = $True, ParameterSetName = "NtEventLogComputerSet")]
         [ValidateNotNull()]
         # Validate there is no ':' character
             [string]$SourceName,
-        [Parameter(Mandatory = $False, ParameterSetName = "NtEventLog")]
+        
+        [Parameter(ParameterSetName = "NtEventLogComputerSet")]
             [string]$UNCServerName = 'localhost',
+        
         #endregion NtEventLogParameters
 
         #region SMTPParameters
-        [Parameter(Mandatory = $False, ParameterSetName = "SMTP")]
+        [Parameter(ParameterSetName = "SMTPComputerSet")]
             [string]$BccLine = $null,
-        [Parameter(Mandatory = $False, ParameterSetName = "SMTP")]
+        
+        [Parameter(ParameterSetName = "SMTPComputerSet")]
             [string]$CcLine = $null,
-        [Parameter(Mandatory = $False, ParameterSetName = "SMTP")]
+        
+        [Parameter(ParameterSetName = "SMTPComputerSet")]
             [string]$FromLine = $null,
-        [Parameter(Mandatory = $False, ParameterSetName = "SMTP")]
+        
+        [Parameter(ParameterSetName = "SMTPComputerSet")]
             [string[]]$HeaderFields = $null,
-        [Parameter(Mandatory = $True, ParameterSetName = "SMTP")]
+        
+        [Parameter(Mandatory = $True, ParameterSetName = "SMTPComputerSet")]
             [string]$Message,
-        [Parameter(Mandatory = $False, ParameterSetName = "SMTP")]
+        
+        [Parameter(ParameterSetName = "SMTPComputerSet")]
             [string]$ReplyToLine = $null,
-        [Parameter(Mandatory = $True, ParameterSetName = "SMTP")]
+        
+        [Parameter(Mandatory = $True, ParameterSetName = "SMTPComputerSet")]
         [ValidateNotNull()]
             [string]$SMTPServer,
-        [Parameter(Mandatory = $False, ParameterSetName = "SMTP")]
+        
+        [Parameter(ParameterSetName = "SMTPComputerSet")]
             [string]$Subject = $null,
-        [Parameter(Mandatory = $True, ParameterSetName = "SMTP")]
+        
+        [Parameter(Mandatory = $True, ParameterSetName = "SMTPComputerSet")]
             [string]$ToLine
+        
         #endregion SMTPParameters
     )
 
-    PROCESS
+    BEGIN
     {
-        foreach($computer in $ComputerName)
+        if($PSCmdlet.ParameterSetName.Contains('ActiveScript'))
         {
-            if($PSCmdlet.ParameterSetName.Contains("ActiveScript"))
+            $class = 'ActiveScriptEventConsumer'
+            
+            if($PSCmdlet.ParameterSetName.Contains('File'))
             {
-                    $class = [WMICLASS]"\\$computer\root\subscription:ActiveScriptEventConsumer"
-                
-                    $instance = $class.CreateInstance()
-                    $instance.Name = $Name
-                    $instance.KillTimeout = $KillTimeout
-                    $instance.ScriptingEngine = $ScriptingEngine
-                    if($PSCmdlet.ParameterSetName -eq "ActiveScriptFile")
-                    {
-                        $instance.ScriptFileName = $ScriptFileName
-                        $instance.ScriptText = $null
-                    }
-                    elseif($PSCmdlet.ParameterSetName -eq "ActiveScriptText")
-                    {
-                        $instance.ScriptFileName = $null
-                        $instance.ScriptText = $ScriptText
-                    }
-
-                    $instance.Put()
+                $props = @{
+                    'Name' = $Name
+                    'KillTimeout' = $KillTimeout
+                    'ScriptingEngine' = $ScriptingEngine
+                    'ScriptFileName' = $ScriptFileName
+                    'ScriptText' = $null
                 }
-            elseif($PSCmdlet.ParameterSetName -eq "CommandLine")
+            }
+            elseif($PSCmdlet.ParameterSetName.Contains('Text'))
             {
-                    $class = [WMICLASS]"\\$computer\root\subscription:CommandLineEventConsumer"
-
-                    $instance = $class.CreateInstance()
-                    $instance.Name = $Name
-                    $instance.CommandLineTemplate = $CommandLineTemplate
-                    $instance.CreateNewProcessGroup = $CreateNewProcessGroup
-                    $instance.CreateSeparateWowVdm = $CreateSeparateWowVdm
-                    $instance.CreateSharedWowVdm = $CreateSharedWowVdm
-                    $instance.ExecutablePath = $ExecutablePath
-                    $instance.ForceOffFeedback = $ForceOffFeedback
-                    $instance.ForceOnFeedback = $ForceOnFeedback
-                    $instance.KillTimeout = $KillTimeout
-                    $instance.Priority = $Priority
-                    $instance.RunInteractively = $RunInteractively
-                    $instance.ShowWindowCommand = $ShowWindowCommand
-                    $instance.UseDefaultErrorMode = $UseDefaultErrorMode
-                    $instance.WindowTitle = $WindowTitle
-                    $instance.WorkingDirectory = $WorkingDirectory
-                    $instance.XCoordinate = $XCoordinate
-                    $instance.XNumCharacters = $XNumCharacters
-                    $instance.XSize = $XSize
-                    $instance.YCoordinate = $YCoordinate
-                    $instance.YNumCharacters = $YNumCharacters
-                    $instance.YSize = $YSize
-
-                    $instance.Put()
+                $props = @{
+                    'Name' = $Name
+                    'KillTimeout' = $KillTimeout
+                    'ScriptingEngine' = $ScriptingEngine
+                    'ScriptFileName' = $null
+                    'ScriptText' = $ScriptText
                 }
-            elseif($PSCmdlet.ParameterSetName -eq "LogFile")
-            {
-                    $class = [WMICLASS]"\\$computer\root\subscription:LogFileEventConsumer"
-                
-                    $instance = $class.CreateInstance()
-                    $instance.Name = $Name
-                    $instance.Filename = $Filename
-                    $instance.IsUnicode = $IsUnicode
-                    $instance.MaximumFileSize = $MaximumFileSize
-                    $instance.Text = $Text
-
-                    $instance.Put()
-                }
-            elseif($PSCmdlet.ParameterSetName -eq "NtEventLog")
-            {
-                    $class = [WMICLASS]"\\$computer\root\subscription:NtEventLogEventConsumer"
-
-                    $instance = $class.CreateInstance()
-                    $instance.Category = $Category
-                    $instance.EventID = $EventID
-                    $instance.EventType = $EventType
-                    $instance.InsertionStringTemplates = $InsertionStringTemplates
-                    $instance.NumberOfInsertionStrings = $InsertionStringTemplates.Length
-                    $instance.NameOfUserSidProperty = $NameOfUserSidProperty
-                    $instance.NameOfRawDataProperty = $NameOfRawDataProperty
-                    $instance.SourceName = $SourceName
-                    $instance.UNCServerName = $UNCServerName
-
-                    $instance.Put()
-                }
-            elseif($PSCmdlet.ParameterSetName -eq "SMTP")
-            {
-                    $class = [WMICLASS]"\\$computer\root\subscription:SMTPEventConsumer"
-                
-                    $instance = $class.CreateInstance()
-                    $instance.BccLine = $BccLine
-                    $instance.CcLine = $CcLine
-                    $instance.FromLine = $FromLine
-                    $instance.HeaderFields = $HeaderFields
-                    $instance.Message = $Message
-                    $instance.ReplyToLine = $ReplyToLine
-                    $instance.SMTPServer = $SMTPServer
-                    $instance.Subject = $Subject
-                    $instance.ToLine = $ToLine
-
-                    $instance.Put()
-                }
+            }
             else
             {
-                Write-Error "No ParameterSet Chosen"
+                Write-Error 'No valid Parameter Set chosen'
             }
         }
+        elseif($PSCmdlet.ParameterSetName.Contains('CommandLine'))
+        {
+            $class = 'CommandLineEventConsumer'
+
+            if($PSCmdlet.ParameterSetName.Contains('Template'))
+            {
+                $props = @{
+                    'Name' = $Name
+                    'CommandLineTemplate' = $CommandLineTemplate
+                    'CreateNewProcessGroup' = $CreateNewProcessGroup
+                    'CreateSeparateWowVdm' = $CreateSeparateWowVdm
+                    'CreateSharedWowVdm' = $CreateSharedWowVdm
+                    'ExecutablePath' = $Null
+                    'ForceOffFeedback' = $ForceOffFeedback
+                    'ForceOnFeedback' = $ForceOnFeedback
+                    'KillTimeout' = $KillTimeout
+                    'Priority' = $Priority
+                    'RunInteractively' = $RunInteractively
+                    'ShowWindowCommand' = $ShowWindowCommand
+                    'UseDefaultErrorMode' = $UseDefaultErrorMode
+                    'WindowTitle' = $WindowTitle
+                    'WorkingDirectory' = $WorkingDirectory
+                    'XCoordinate' = $XCoordinate
+                    'XNumCharacters' = $XNumCharacters
+                    'XSize' = $XSize
+                    'YCoordinate' = $YCoordinate
+                    'YNumCharacters' = $YNumCharacters
+                    'YSize' = $YSize
+                }
+            }
+            else
+            {
+                $props = @{
+                    'Name' = $Name
+                    'CommandLineTemplate' = $Null
+                    'CreateNewProcessGroup' = $CreateNewProcessGroup
+                    'CreateSeparateWowVdm' = $CreateSeparateWowVdm
+                    'CreateSharedWowVdm' = $CreateSharedWowVdm
+                    'ExecutablePath' = $ExecutablePath
+                    'ForceOffFeedback' = $ForceOffFeedback
+                    'ForceOnFeedback' = $ForceOnFeedback
+                    'KillTimeout' = $KillTimeout
+                    'Priority' = $Priority
+                    'RunInteractively' = $RunInteractively
+                    'ShowWindowCommand' = $ShowWindowCommand
+                    'UseDefaultErrorMode' = $UseDefaultErrorMode
+                    'WindowTitle' = $WindowTitle
+                    'WorkingDirectory' = $WorkingDirectory
+                    'XCoordinate' = $XCoordinate
+                    'XNumCharacters' = $XNumCharacters
+                    'XSize' = $XSize
+                    'YCoordinate' = $YCoordinate
+                    'YNumCharacters' = $YNumCharacters
+                    'YSize' = $YSize
+                }
+            }
+        }
+        elseif($PSCmdlet.ParameterSetName.Contains('LogFile'))
+        {
+            $class = 'LogFileEventConsumer'
+
+            $props = @{
+                'Name' = $Name
+                'Filename' = $Filename
+                'IsUnicode' = $IsUnicode
+                'MaximumFileSize' = $MaximumFileSize
+                'Text' = $Text
+            }
+        }
+        elseif($PSCmdlet.ParameterSetName.Contains('NtEventLog'))
+        {
+            $class = 'NtEventLogEventConsumer'
+
+            $props = @{
+                'Category' = $Category
+                'EventID' = $EventID
+                'EventType' = $EventType
+                'InsertionStringTemplates' = $InsertionStringTemplates
+                'NumberOfInsertionStrings' = $InsertionStringTemplates.Length
+                'NameOfUserSidProperty' = $NameOfUserSidProperty
+                'NameOfRawDataProperty' = $NameOfRawDataProperty
+                'SourceName' = $SourceName
+                'UNCServerName' = $UNCServerName
+            }
+        }
+        elseif($PSCmdlet.ParameterSetName.Contains('SMTP'))
+        {
+            $class = 'SMTPEventConsumer'
+
+            $props = @{
+                'BccLine' = $BccLine
+                'CcLine' = $CcLine
+                'FromLine' = $FromLine
+                'HeaderFields' = $HeaderFields
+                'Message' = $Message
+                'ReplyToLine' = $ReplyToLine
+                'SMTPServer' = $SMTPServer
+                'Subject' = $Subject
+                'ToLine' = $ToLine
+            }
+        }
+        else
+        {
+            Write-Error 'No valid Parameter Set chosen'
+        }
+    }
+
+    PROCESS
+    {
+        $jobs = Set-WmiInstance -ComputerName $ComputerName -Namespace root\subscription -Class $class -Arguments $props -AsJob
+    }
+    
+    END
+    {
+        Receive-Job -Job $jobs -Wait -AutoRemoveJob
     }
 }

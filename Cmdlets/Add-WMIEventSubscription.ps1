@@ -1,29 +1,30 @@
 ﻿function Add-WmiEventSubscription
 {
-    [CmdletBinding(DefaultParameterSetName = 'Name')]
+        [CmdletBinding()]
     Param(
-        [Parameter(Mandatory = $False, ValueFromPipeline = $True)]
+        [Parameter(ValueFromPipeline = $True)]
             [string[]]$ComputerName = 'localhost',
-        [Parameter(Mandatory = $True, ParameterSetName = 'Name')]
+        [Parameter(Mandatory = $True)]
             [string]$FilterName,
-        [Parameter(Mandatory = $True, ParameterSetName = 'Name')]
+        [Parameter(Mandatory = $True)]
             [string]$ConsumerName
     )
 
+    BEGIN
+    {
+        $props = @{
+            'Filter' = "\\.\ROOT\subscription:__EventFilter.Name=`"$($FilterName)`"";
+            'Consumer' = "\\.\ROOT\subscription:__EventConsume.Name=`"$($ConsumerName)`"";
+        }
+    }
+
     PROCESS
     {
-        foreach($computer in $ComputerName)
-        {
-            $class = [WMICLASS]"\\$computer\root\subscription:__FilterToConsumerBinding"
-            
-            $instance = $class.CreateInstance()
-            if($PSCmdlet.ParameterSetName -eq 'Name')
-            {
-                $instance.Filter = (Get-WMIEventFilter -ComputerName $computer -Name $FilterName).Path
-                $instance.Consumer = (Get-WMIEventConsumer -ComputerName $computer -Name $ConsumerName).Path
-            }
+        $jobs = Set-WmiInstance -ComputerName $ComputerName -Namespace root\subscription -Class __FilterToConsumerBinding -Arguments $props -AsJob
+    }
 
-            $instance.Put()
-        }
+    END
+    {
+        Receive-Job -Job $jobs -Wait -AutoRemoveJob
     }
 }

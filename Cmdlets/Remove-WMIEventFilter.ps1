@@ -2,10 +2,12 @@
 {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     Param(
-        [Parameter(Mandatory = $False)]
+        [Parameter()]
             [string[]]$ComputerName = 'localhost',
+
         [Parameter(Mandatory = $True, ParameterSetName = "Name", Position = 0)]
             [string]$Name,
+
         [Parameter(Mandatory = $True, ParameterSetName = "InputObject", ValueFromPipeline = $True)]
             $InputObject
     )
@@ -14,25 +16,27 @@
     {
         if($PSCmdlet.ParameterSetName -eq "InputObject")
         {
-            ([WMI]$InputObject.Path).Delete()
+            foreach($obj in $InputObject)
+            {
+                ([WMI]$obj.Path).Delete()
+            }
         }
         else
         {
-            foreach($computer in $ComputerName)
+            if($PSCmdlet.ParameterSetName -eq "Name")
             {
-                if($PSCmdlet.ParameterSetName -eq "Name")
-                {
-                    $objects = Get-WmiObject -ComputerName $computer -Namespace 'root\subscription' -Class '__EventFilter' -Filter "Name=`'$Name`'"
-                }
-                else
-                {
-                    $objects = Get-WmiObject -ComputerName $computer -Namespace 'root\subscription' -Class '__EventFilter'
-                }
+                $jobs = Get-WmiObject -ComputerName $ComputerName -Namespace 'root\subscription' -Class '__EventFilter' -Filter "Name=`'$($Name)`'" -AsJob
+            }
+            else
+            {
+                $jobs = Get-WmiObject -ComputerName $ComputerName -Namespace 'root\subscription' -Class '__EventFilter' -AsJob
+            }
 
-                foreach($obj in $objects)
-                {
-                    $obj | Remove-WmiObject
-                }
+            $objects = Receive-Job -Job $jobs -Wait -AutoRemoveJob
+
+            foreach($obj in $objects)
+            {
+                $obj | Remove-WmiObject
             }
         }
     }

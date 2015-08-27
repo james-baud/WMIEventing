@@ -2,10 +2,12 @@
 {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     Param(
-        [Parameter(Mandatory = $False)]
+        [Parameter()]
             [string[]]$ComputerName = 'localhost',
+        
         [Parameter(Mandatory = $True, ParameterSetName = 'Name', Position = 0)]
             [string]$Name,
+
         [Parameter(Mandatory = $True, ParameterSetName = "InputObject", ValueFromPipeline = $True)]
             $InputObject
     )
@@ -18,26 +20,19 @@
         }
         else
         {
-            foreach($computer in $ComputerName)
+            $jobs = Get-WmiObject -ComputerName $ComputerName -Namespace 'root\subscription' -Class __EventConsumer -AsJob
+            
+            $objects = Receive-Job -Job $jobs -Wait -AutoRemoveJob
+
+            if($PSCmdlet.ParameterSetName -eq 'Name')
             {
-                if($PSCmdlet.ParameterSetName -eq 'Name')
-                {
-                    $objects = Get-WmiObject -ComputerName $computer -Namespace 'root\subscription' -Class __EventConsumer | Where-Object {$_.Name -eq $Name}
-                    #if($objects = $null)
-                    #{
-                    #    $Exception = New-Object System.Exception("Get-WmiEventConsumer : Cannot find a consumer with the name `"$Name`". Verify the consumer name and call the cmdlet again.")
-                    #    throw
-                    #}
-                }
-                else
-                {
-                    $objects = Get-WmiObject -ComputerName $computer -Namespace 'root\subscription' -Class __EventConsumer
-                }
+                $objects = $objects | Where-Object {$_.Name -eq $Name}
             }
-        }
-        foreach($obj in $objects)
-        {
-            $obj | Remove-WmiObject
+        
+            foreach($obj in $objects)
+            {
+                $obj | Remove-WmiObject
+            }
         }
     }
 }

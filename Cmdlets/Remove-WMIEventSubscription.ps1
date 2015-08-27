@@ -2,12 +2,15 @@
 {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     Param(
-        [Parameter(Mandatory = $False)]
+        [Parameter()]
             [string[]]$ComputerName = 'localhost',
-        [Parameter(Mandatory = $False)]
-            [switch]$Force,
+
+        #[Parameter()]
+        #    [switch]$Force,
+        
         [Parameter(Mandatory = $True, ParameterSetName = 'Name', Position = 0)]
             [string]$Name,
+        
         [Parameter(Mandatory = $True, ParameterSetName = "InputObject", ValueFromPipeline = $True)]
             $InputObject
     )
@@ -16,65 +19,25 @@
     {
         if($PSCmdlet.ParameterSetName -eq "InputObject")
         {
-            if($Force)
+            foreach($obj in $InputObject)
             {
-                try
-                {
-                    ([WMI]$InputObject.FilterPath).Delete()
-                }
-                catch
-                {
-                    Write-Warning "Instance of $InputObject.FilterPath does not exist"
-                }
-
-                try
-                {
-                    ([WMI]$InputObject.ConsumerPath).Delete()
-                }
-                catch
-                {
-                    Write-Warning "Instance of $InputObject.ConsumerPath does not exist"
-                }
+                ([WMI]$obj.Path).Delete()
             }
-            ([WMI]$InputObject.Path).Delete()
         }
         else
         {
-            foreach($computer in $ComputerName)
+            $jobs = Get-WmiObject -ComputerName $ComputerName -Namespace root\subscription -Class __FilterToConsumerBinding -AsJob
+            
+            $objects = Receive-Job -Job $jobs -Wait -AutoRemoveJob
+
+            if($PSCmdlet.ParameterSetName -eq 'Name')
             {
-                if($PSCmdlet.ParameterSetName -eq 'Name')
-                {
-                    $objects = Get-WmiObject -ComputerName $computer -Namespace root\subscription -Class __FilterToConsumerBinding | Where-Object {$_.Filter.Split('"')[1].Split('"')[0] -eq $Name}
-                }
-                else
-                {
-                    $objects = Get-WmiObject -ComputerName $computer -Namespace root\subscription -Class __FilterToConsumerBinding
-                }
-
-                foreach($obj in $objects)
-                {
-                    if($Force)
-                    {
-                        try
-                        {
-                            ([WMI]$InputObject.Filter).Delete()
-                        }
-                        catch
-                        {
-                            Write-Warning "Instance of $InputObject.FilterPath does not exist"
-                        }
-
-                        try
-                        {
-                            ([WMI]$obj.Consumer).Delete()
-                        }
-                        catch
-                        {
-                            Write-Warning "Instance of $InputObject.ConsumerPath does not exist"
-                        }
-                    }
-                    $obj | Remove-WmiObject
-                }
+                $objects = $objects | Where-Object {$_.Filter.Split('"')[1].Split('"')[0] -eq $Name}
+            }
+            
+            foreach($obj in $objects)
+            {
+                $obj | Remove-WmiObject
             }
         }
     }
