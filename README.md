@@ -56,12 +56,12 @@ Import-Module Uproot
 ```
 
 ## Examples
-### Add an __EventFilter
+### Add-WmiEventFilter
 ```powershell
 Add-WmiEventFilter -Name ProcessStartTrace -Query "SELECT * FROM Win32_ProcessStartTrace"
 ```
 
-### Add an ActiveScriptEventConsumer
+### Add-WmiEventConsumer (ActiveScriptEventConsumer)
 ```powershell
 $script = @"
 Set objSysInfo = CreateObject("WinNTSystemInfo")
