@@ -75,11 +75,13 @@ You are now ready to use the WMIEventing PowerShell module!
 
 ## Examples
 ### Add-WmiEventFilter
+Add an Event Filter named "ProcessStartTrace" that monitors for instances of the Win32_ProcessStartTrace WMI Class:
 ```powershell
 Add-WmiEventFilter -Name ProcessStartTrace -Query "SELECT * FROM Win32_ProcessStartTrace"
 ```
 
-### Add-WmiEventConsumer (ActiveScriptEventConsumer)
+### Add-WmiEventConsumer (ActiveScriptEventConsumer Script Text)
+Add an ActiveScriptEventConsumer call "AS_GenericHTTP" with an embedded ScriptText:
 ```powershell
 $script = @"
 Set objSysInfo = CreateObject("WinNTSystemInfo")
@@ -141,61 +143,71 @@ Add-WmiEventConsumer -Name AS_GenericHTTP -ScriptingEngine VBScript -ScriptText 
 ```
 
 ### Add-WmiEventSubscription
+Add a Subscription that pairs the "ProcessStartTrace" Filter with the "AS_GenericHTTP" ActiveScriptEventConsumer:
 ```powershell
 Add-WmiEventSubscription -FilterName ProcessStartTrace -ConsumerName AS_GenericHTTP -ConsumerType ActiveScriptEventConsumer
 ```
 
 ### Get-WmiEventFilter
+Get all Event Filters on the local system:
 ```powershell
 Get-WmiEventFilter
 ```
-
+Get the Event Filter named "ProcessStartTrace" on the local system
 ```powershell
 Get-WmiEventFilter -Name ProcessStartTrace
 ```
 
 ### Get-WmiEventConsumer
+Get all Event Consumers on the local system:
 ```powershell
 Get-WmiEventConsumer
 ```
-
+Get the Event Consumer named "AS_GenericHTTP" on the local system:
 ```powershell
 Get-WmiEventConsumer -Name AS_GenericHTTP
 ```
 
 ### Get-WmiEventSubscription
+Get all Event Subscriptions on the local system:
 ```powershell
 Get-WmiEventSubscripton
 ```
 
 ### Remove-WmiEventFilter
+Remove all Event Filters from the local system:
 ```powershell
 Remove-WmiEventFilter
 ```
-
+Remove the Event Filter named "ProcessStartTrace" from the local system:
 ```powershell
 Remove-WmiEventFilter -Name ProcessStartTrace
 ```
-
+Get all Event Filters and pass them through the pipeline for removal:
 ```powershell
 Get-WmiEventFilter | Remove-WmiEventFilter
 ```
 
 ### Remove-WmiEventConsumer
+Remove all Event Consumers from the local system:
 ```powershell
 Remove-WmiEventConsumer
 ```
-
+Remove the Event Consumer named "AS_GenericHTTP" from the local system:
 ```powershell
 Remove-WmiEventConsumer -Name AS_GenericHTTP
 ```
-
+Get all Event Consumers and pass them through the pipeline for removal:
 ```powershell
 Get-WmiEventConsumer | Remove-WmiEventConsumer
 ```
 
 ### Remove-WmiEventSubscription
+Remove all Event Subscriptions from the local system:
 ```powershell
 Remove-WmiEventSubscription
 ```
-
+Get all Event Subscriptions and pass them through the pipeline for removal:
+```powershell
+Get-WmiEventSubscription | Remove-WmiEventSubscription
+```
