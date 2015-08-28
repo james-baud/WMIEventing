@@ -32,7 +32,9 @@ Jakub Jareš wrote an [excellent introduction](http://www.powershellmagazine.com
 
 To begin open an internet browser and navigate to the main WMIEventing github [page](https://github.com/Invoke-IR/WMIEventing). Once on this page you will need to download and extract the module into your modules directory.
 
-![alt text](http://4.bp.blogspot.com/--awwh6xvH_A/Vd_C3tQpitI/AAAAAAAAA3Y/lCPGXa8mk08/s640/Screenshot%2B2015-08-27%2B21.52.40.png)
+<p align="center">
+  <img src="http://4.bp.blogspot.com/--awwh6xvH_A/Vd_C3tQpitI/AAAAAAAAA3Y/lCPGXa8mk08/s640/Screenshot%2B2015-08-27%2B21.52.40.png">
+</p>
 
 If you used Internet Explorer to download the archive, you need to unblock the archive before extraction, otherwise PowerShell will complain when you import the module. If you are using PowerShell 3.0 or newer you can use the Unblock-File cmdlet to do that:
 ```powershell
@@ -41,7 +43,9 @@ Unblock-File -Path "$env:UserProfile\Downloads\WMIEventing-master.zip"
 
 If you are using an older version of PowerShell you will have to unblock the file manually. Go to your Downloads folder and right-click WMIEventing-master.zip and select "Properties". On the general tab click Unblock and then click OK to close the dialog.
 
-![alt text](http://2.bp.blogspot.com/-4QzeiRBwHfI/Vd_C3l1dIXI/AAAAAAAAA3U/rvverb1qbpM/s640/Screenshot%2B2015-08-27%2B21.57.21.png)
+<p align="center">
+  <img src="http://2.bp.blogspot.com/-4QzeiRBwHfI/Vd_C3l1dIXI/AAAAAAAAA3U/rvverb1qbpM/s640/Screenshot%2B2015-08-27%2B21.57.21.png">
+</p>
 
 Open your Modules directory and create a new folder called WMIEventing. You can use this script to open the correct folder effortlessly:
 ```powershell
@@ -62,7 +66,9 @@ Invoke-Item (Get-UserModulePath)
 
 Extract the archive to the WMIEventing folder. When you are done you should have all these files in your WMIEventing directory:
 
-![alt text](http://4.bp.blogspot.com/-NfSl2E5G7CM/Vd_Ei6Q_r6I/AAAAAAAAA3o/Ats2BlDSzmk/s640/Screenshot%2B2015-08-27%2B22.16.28.png)
+<p align="center">
+  <img src="http://4.bp.blogspot.com/-NfSl2E5G7CM/Vd_Ei6Q_r6I/AAAAAAAAA3o/Ats2BlDSzmk/s640/Screenshot%2B2015-08-27%2B22.16.28.png">
+</p>
 
 Start a new PowerShell session and import the WMIEventing module using the commands below:
 ```powershell
